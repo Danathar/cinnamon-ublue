@@ -123,9 +123,6 @@ Root cause was stale tag usage (`localhost/cinnamon:latest` still pointing to an
 4. bootc-image-builder manifest error for `/boot`
 Required adding `--rootfs btrfs` when generating qcow2.
 
-5. No `default` network in `qemu:///session`
-Use `virt-install --network user,model=virtio` instead of `--network network=default`.
-
 ## GitHub Actions Notes
 
 - `build.yml`: builds/pushes image on push/schedule/manual.
