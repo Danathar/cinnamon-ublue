@@ -73,6 +73,28 @@ sudo podman run --rm -it --privileged \
 
 Output is in `output/qcow2/disk.qcow2`.
 
+### Create a VM with `virt-install`
+
+After copying `disk.qcow2` to your host system:
+
+```bash
+virt-install \
+  --name cinnamon-ublue-test \
+  --memory 4096 \
+  --vcpus 4 \
+  --cpu host-passthrough \
+  --import \
+  --disk path=/var/home/$USER/disk.qcow2,format=qcow2,bus=virtio \
+  --os-variant fedora-unknown \
+  --network user,model=virtio \
+  --graphics spice \
+  --video virtio \
+  --channel spicevmc \
+  --boot uefi
+```
+
+If you use `qemu:///session`, `--network user,model=virtio` is the safe default.
+
 ### Change Disk Type
 
 Change `--type`:
