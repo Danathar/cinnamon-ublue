@@ -81,6 +81,49 @@ Change `--type`:
 - `--type raw` for raw disk image workflows
 - `--type ami` for AWS-style image outputs (when supported by your build setup)
 
+## Run on Bare Metal
+
+For physical hardware, generate a `raw` disk image and write it to the target disk.
+
+1. Prepare files:
+
+```bash
+mkdir -p output
+curl -fsSLO https://raw.githubusercontent.com/Danathar/cinnamon-ublue/main/config.toml
+sudo podman pull ghcr.io/danathar/cinnamon:latest
+```
+
+2. Build raw image:
+
+```bash
+sudo podman run --rm -it --privileged \
+  --security-opt label=type:unconfined_t \
+  -v "$(pwd)/config.toml:/config.toml:ro" \
+  -v "$(pwd)/output:/output" \
+  -v /var/lib/containers/storage:/var/lib/containers/storage \
+  quay.io/centos-bootc/bootc-image-builder:latest \
+  --type raw \
+  --rootfs btrfs \
+  --config /config.toml \
+  ghcr.io/danathar/cinnamon:latest
+```
+
+3. Write image to target disk (example: `/dev/nvme0n1`):
+
+```bash
+sudo lsblk
+sudo dd if=output/raw/disk.raw of=/dev/nvme0n1 bs=16M status=progress oflag=direct conv=fsync
+sync
+```
+
+4. Reboot into the installed disk.
+
+Notes:
+
+- `dd` will erase the target disk completely. Double-check device path with `lsblk`.
+- If your output filename differs, check `output/raw/` and adjust the `dd if=` path.
+- User setup comes from `config.toml` (currently user `cin` with password `changeme`).
+
 ### Change Disk Size
 
 Set size in `config.toml`:
