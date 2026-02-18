@@ -17,6 +17,8 @@ permissions:
 jobs:
   build:
     runs-on: ubuntu-latest
+    env:
+      COSIGN_PASSWORD: ${{ secrets.COSIGN_PASSWORD }}
     strategy:
       matrix:
         recipe:
@@ -25,5 +27,5 @@ jobs:
       - name: Build image
         uses: blue-build/github-action@v1.8.2
         with:
-          recipe: recipes/${{ matrix.recipe }}
+          recipe: ${{ matrix.recipe }}
           cosign_private_key: ${{ secrets.SIGNING_SECRET }}
