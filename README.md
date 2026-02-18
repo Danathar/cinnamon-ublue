@@ -8,8 +8,10 @@ Fedora bootc/Universal Blue style image using Cinnamon, built with BlueBuild.
 - Desktop: `cinnamon-desktop` group + `lightdm` + `slick-greeter`
 - `distrobox`
 - Homebrew via BlueBuild `brew` module
-- One-shot Bluefin curated Homebrew sync (`regular` + `developer`) via `bluefin-brew-sync.service`
-  - Runs on first boot on the deployed system (not at image build time); let it complete before checking `brew list`
+- One-shot Bluefin-curated app sync via `bluefin-brew-sync.service`
+  - Homebrew: `cli` + `ide` curated sets
+  - Flatpaks: Bluefin-like curated system app subset (Firefox excluded because RPM Firefox is included)
+  - Runs on first boot on the deployed system (not at image build time); let it complete before checking `brew list` or `flatpak list`
 - GitHub Actions build workflows in `.github/workflows/`
 
 ## Build Locally
