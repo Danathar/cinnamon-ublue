@@ -9,6 +9,7 @@ Fedora bootc/Universal Blue style image using Cinnamon, built with BlueBuild.
 - `distrobox`
 - Homebrew via BlueBuild `brew` module
 - One-shot Bluefin curated Homebrew sync (`regular` + `developer`) via `bluefin-brew-sync.service`
+  - Runs on first boot on the deployed system (not at image build time); let it complete before checking `brew list`
 - GitHub Actions build workflows in `.github/workflows/`
 
 ## Build Locally
@@ -154,10 +155,10 @@ Set size in `config.toml`:
 
 ```toml
 [customizations]
-disk = { minsize = "30 GiB" }
+disk = { minsize = "40 GiB" }
 ```
 
-If omitted, builder defaults are used.
+This repository defaults to `40 GiB` in `config.toml`.
 
 ### Add or Change Users in `config.toml`
 
