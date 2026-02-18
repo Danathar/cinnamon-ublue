@@ -45,7 +45,7 @@ mkdir -p output
 2. Pull your published image:
 
 ```bash
-sudo podman pull ghcr.io/Danathar/cinnamon-ublue:latest
+sudo podman pull ghcr.io/danathar/cinnamon:latest
 ```
 
 3. Build a `qcow2` image:
@@ -60,7 +60,7 @@ sudo podman run --rm -it --privileged \
   --type qcow2 \
   --rootfs btrfs \
   --config /config.toml \
-  ghcr.io/Danathar/cinnamon-ublue:latest
+  ghcr.io/danathar/cinnamon:latest
 ```
 
 Output is in `output/qcow2/disk.qcow2`.
