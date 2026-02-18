@@ -56,6 +56,8 @@ sudo podman pull ghcr.io/danathar/cinnamon:latest
 
 4. Build a `qcow2` image:
 
+`output/` must exist before this command (`mkdir -p output`).
+
 ```bash
 sudo podman run --rm -it --privileged \
   --security-opt label=type:unconfined_t \
