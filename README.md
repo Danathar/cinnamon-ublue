@@ -85,6 +85,8 @@ Change `--type`:
 
 For physical hardware, generate a `raw` disk image and write it to the target disk.
 
+Status: this bare-metal flow has not been tested yet in this project.
+
 1. Prepare files:
 
 ```bash
