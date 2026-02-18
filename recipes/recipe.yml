@@ -28,6 +28,30 @@ modules:
   - type: brew
     brew-analytics: false
 
+  - type: default-flatpaks
+    configurations:
+      - notify: true
+        scope: system
+        repo:
+          name: flathub
+          title: Flathub (System)
+          url: https://dl.flathub.org/repo/flathub.flatpakrepo
+        install:
+          - com.github.PintaProject.Pinta
+          - com.github.tchx84.Flatseal
+          - com.ranfdev.DistroShelf
+          - io.github.flattool.Ignition
+          - io.github.flattool.Warehouse
+          - io.github.kolunmi.Bazaar
+          - io.gitlab.adhami3310.Impression
+          - io.missioncenter.MissionCenter
+          - it.mijorus.smile
+          - org.gnome.Connections
+          - org.gnome.DejaDup
+          - org.gnome.Firmware
+          - org.gnome.Logs
+          - page.tesk.Refine
+
   - type: systemd
     system:
       enabled:

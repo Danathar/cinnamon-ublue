@@ -138,37 +138,5 @@ common_env=(
 runuser -u "${TARGET_NAME}" -- env "${common_env[@]}" "${brew_bin}" bundle --file "${regular_brewfile}"
 runuser -u "${TARGET_NAME}" -- env "${common_env[@]}" "${brew_bin}" bundle --file "${developer_brewfile}"
 
-# Bluefin-like curated system Flatpaks (Firefox intentionally excluded; RPM is installed).
-if command -v flatpak >/dev/null 2>&1; then
-  if ! flatpak remotes --system | awk '{print $1}' | grep -qx 'flathub'; then
-    flatpak remote-add --if-not-exists --system flathub https://flathub.org/repo/flathub.flatpakrepo || true
-  fi
-
-  flatpaks=(
-    "com.github.PintaProject.Pinta"
-    "com.github.tchx84.Flatseal"
-    "com.ranfdev.DistroShelf"
-    "io.github.flattool.Ignition"
-    "io.github.flattool.Warehouse"
-    "io.github.kolunmi.Bazaar"
-    "io.gitlab.adhami3310.Impression"
-    "io.missioncenter.MissionCenter"
-    "it.mijorus.smile"
-    "org.gnome.Connections"
-    "org.gnome.DejaDup"
-    "org.gnome.Firmware"
-    "org.gnome.Logs"
-    "page.tesk.Refine"
-  )
-
-  for app in "${flatpaks[@]}"; do
-    if ! flatpak install --system -y --noninteractive flathub "${app}"; then
-      echo "Warning: failed to install Flatpak ${app}; continuing."
-    fi
-  done
-else
-  echo "flatpak not found; skipping curated Flatpak installs."
-fi
-
 touch "${STATE_FILE}"
-echo "Bluefin curated brew packages and Flatpaks installed for ${TARGET_NAME}."
+echo "Bluefin curated brew packages installed for ${TARGET_NAME}."
