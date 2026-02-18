@@ -34,15 +34,21 @@ sudo podman tag <NEW_IMAGE_ID> localhost/cinnamon:latest
 
 ## Generate Disk Image From GitHub-Built Image
 
-After GitHub Actions publishes your image to GHCR, generate a qcow2 directly from it.
+After GitHub Actions publishes your image to GHCR, generate a disk image directly from it with `bootc-image-builder`.
 
-1. Pull your published image:
+1. Prepare directories:
+
+```bash
+mkdir -p output
+```
+
+2. Pull your published image:
 
 ```bash
 sudo podman pull ghcr.io/<github-user>/<repo>:latest
 ```
 
-2. Build qcow2 with bootc-image-builder:
+3. Build a `qcow2` image:
 
 ```bash
 sudo podman run --rm -it --privileged \
@@ -58,6 +64,50 @@ sudo podman run --rm -it --privileged \
 ```
 
 Output is in `output/qcow2/disk.qcow2`.
+
+### Change Disk Type
+
+Change `--type`:
+
+- `--type qcow2` for KVM/libvirt/virt-manager
+- `--type raw` for raw disk image workflows
+- `--type ami` for AWS-style image outputs (when supported by your build setup)
+
+### Change Disk Size
+
+Set size in `config.toml`:
+
+```toml
+[customizations]
+disk = { minsize = "30 GiB" }
+```
+
+If omitted, builder defaults are used.
+
+### Add or Change Users in `config.toml`
+
+Current user block:
+
+```toml
+[[customizations.user]]
+name = "cin"
+password = "changeme"
+groups = ["wheel"]
+```
+
+Add more users by adding additional `[[customizations.user]]` blocks:
+
+```toml
+[[customizations.user]]
+name = "alice"
+password = "changeme"
+groups = ["wheel"]
+
+[[customizations.user]]
+name = "bob"
+password = "changeme"
+groups = []
+```
 
 ## Issues We Fixed
 
@@ -81,3 +131,5 @@ Use `virt-install --network user,model=virtio` instead of `--network network=def
 - `build.yml`: builds/pushes image on push/schedule/manual.
 - `build-pr.yml`: PR validation build.
 - Add secret `SIGNING_SECRET` with contents of `cosign.key`.
+- Add secret `COSIGN_PASSWORD` with the password used to generate `cosign.key` (use empty string only if your key was created with empty password).
+- `build.yml` ignores README-only pushes.
