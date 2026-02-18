@@ -1,0 +1,37 @@
+# yaml-language-server: $schema=https://schema.blue-build.org/recipe-v1.json
+name: cinnamon
+
+description: >-
+  Universal Blue based Cinnamon image built with BlueBuild.
+
+base-image: ghcr.io/ublue-os/base-main
+image-version: latest
+
+modules:
+  - type: dnf
+    group-install:
+      with-optional: true
+      packages:
+        - cinnamon-desktop
+    install:
+      packages:
+        - lightdm
+        - lightdm-gtk
+        - slick-greeter
+        - distrobox
+
+  - type: files
+    files:
+      - source: system
+        destination: /
+
+  - type: brew
+    brew-analytics: false
+
+  - type: systemd
+    system:
+      enabled:
+        - lightdm.service
+        - bluefin-brew-sync.service
+
+  - type: signing

@@ -1,0 +1,17 @@
+name: Build PR Image
+
+on:
+  pull_request:
+
+permissions:
+  contents: read
+  packages: read
+
+jobs:
+  build-pr:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Build image for PR validation
+        uses: blue-build/github-action@v1.8.2
+        with:
+          recipe: recipes/recipe.yml
