@@ -42,13 +42,19 @@ After GitHub Actions publishes your image to GHCR, generate a disk image directl
 mkdir -p output
 ```
 
-2. Pull your published image:
+2. Download `config.toml` from this repository:
+
+```bash
+curl -fsSLO https://raw.githubusercontent.com/Danathar/cinnamon-ublue/main/config.toml
+```
+
+3. Pull your published image:
 
 ```bash
 sudo podman pull ghcr.io/danathar/cinnamon:latest
 ```
 
-3. Build a `qcow2` image:
+4. Build a `qcow2` image:
 
 ```bash
 sudo podman run --rm -it --privileged \
