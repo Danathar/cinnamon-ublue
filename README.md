@@ -3,7 +3,7 @@
 Fedora bootc/Universal Blue style image using Cinnamon, built with BlueBuild.
 
 > This is **not** an official Universal Blue image.  
-> It is an experimental community project.
+> It is a personal experimental project.
 
 ## Included
 
