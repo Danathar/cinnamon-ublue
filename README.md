@@ -46,7 +46,7 @@ mkdir -p output
 2. Download `config.toml` from this repository:
 
 ```bash
-curl -fsSLO https://raw.githubusercontent.com/Danathar/cinnamon-ublue/main/config.toml
+curl -fsSLO https://raw.githubusercontent.com/Danathar/cinnamon-ublue/refs/heads/main/config.toml
 ```
 
 3. Pull your published image:
@@ -67,7 +67,7 @@ sudo podman run --rm -it --privileged \
   -v /var/lib/containers/storage:/var/lib/containers/storage \
   quay.io/centos-bootc/bootc-image-builder:latest \
   --type qcow2 \
-  --rootfs btrfs \
+  --rootfs ext4 \
   --config /config.toml \
   ghcr.io/danathar/cinnamon:latest
 ```
@@ -128,7 +128,7 @@ sudo podman run --rm -it --privileged \
   -v /var/lib/containers/storage:/var/lib/containers/storage \
   quay.io/centos-bootc/bootc-image-builder:latest \
   --type raw \
-  --rootfs btrfs \
+  --rootfs ext4 \
   --config /config.toml \
   ghcr.io/danathar/cinnamon:latest
 ```
@@ -197,7 +197,7 @@ Added tmpfiles overlay at `files/system/usr/lib/tmpfiles.d/zz-lightdm-local.conf
 Root cause was stale tag usage (`localhost/cinnamon:latest` still pointing to an older image). The fix was to retag the newest loaded image ID before generating qcow2.
 
 4. bootc-image-builder manifest error for `/boot`
-Required adding `--rootfs btrfs` when generating qcow2.
+Required setting a supported root filesystem (`--rootfs ext4`) when generating qcow2.
 
 ## GitHub Actions Notes
 
