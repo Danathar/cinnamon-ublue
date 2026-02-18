@@ -16,3 +16,4 @@ jobs:
         with:
           recipe: recipe.yml
           no-sign: true
+          registry_token: ${{ github.token }}
