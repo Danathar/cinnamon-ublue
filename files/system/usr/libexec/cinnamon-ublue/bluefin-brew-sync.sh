@@ -5,6 +5,7 @@ set -euo pipefail
 STATE_FILE="/var/lib/bluefin-brew-sync/done"
 WORK_DIR="/var/tmp/bluefin-brew-sync"
 TARGET_USER="${TARGET_USER:-1000}"
+BLUEFIN_IMAGE="${BLUEFIN_IMAGE:-ghcr.io/ublue-os/bluefin:latest}"
 
 if [[ "${TARGET_USER}" =~ ^[0-9]+$ ]]; then
   TARGET_NAME="$(getent passwd "${TARGET_USER}" | cut -d: -f1 || true)"
@@ -24,24 +25,51 @@ if [[ -z "${TARGET_HOME}" ]] || [[ ! -d "${TARGET_HOME}" ]]; then
 fi
 
 mkdir -p "${WORK_DIR}"
-rm -rf "${WORK_DIR:?}/bluefin"
-mkdir -p "${WORK_DIR}/bluefin"
+brew_dir=""
 
-archive="${WORK_DIR}/bluefin.tar.gz"
-curl -fsSL "https://github.com/ublue-os/bluefin/archive/main.tar.gz" -o "${archive}"
-tar -xzf "${archive}" -C "${WORK_DIR}/bluefin" --strip-components=1
+# Preferred source: already present inside the image.
+if [[ -d "/usr/share/ublue-os/homebrew" ]]; then
+  brew_dir="/usr/share/ublue-os/homebrew"
+fi
 
-brew_dir="$(find "${WORK_DIR}/bluefin" -type d -path '*/usr/share/ublue-os/brew' | head -n1 || true)"
+# Fallback source: extract curated Brewfiles from latest Bluefin image.
 if [[ -z "${brew_dir}" ]]; then
-  echo "Could not find Bluefin curated brew directory in Bluefin main."
-  exit 1
+  if ! command -v podman >/dev/null 2>&1; then
+    echo "podman not available and /usr/share/ublue-os/homebrew missing; skipping curated brew sync."
+    touch "${STATE_FILE}"
+    exit 0
+  fi
+
+  rm -rf "${WORK_DIR:?}/bluefin-homebrew"
+  mkdir -p "${WORK_DIR}/bluefin-homebrew"
+
+  if ! podman pull --quiet "${BLUEFIN_IMAGE}" >/dev/null; then
+    echo "Failed to pull ${BLUEFIN_IMAGE}; skipping curated brew sync."
+    touch "${STATE_FILE}"
+    exit 0
+  fi
+
+  container_id="$(podman create "${BLUEFIN_IMAGE}" true)"
+  cleanup() {
+    podman rm -f "${container_id}" >/dev/null 2>&1 || true
+  }
+  trap cleanup EXIT
+
+  if podman cp "${container_id}:/usr/share/ublue-os/homebrew/." "${WORK_DIR}/bluefin-homebrew/" >/dev/null 2>&1; then
+    brew_dir="${WORK_DIR}/bluefin-homebrew"
+  else
+    echo "Could not extract /usr/share/ublue-os/homebrew from ${BLUEFIN_IMAGE}; skipping curated brew sync."
+    touch "${STATE_FILE}"
+    exit 0
+  fi
 fi
 
 regular_brewfile=""
 for candidate in \
-  "${brew_dir}/Brewfile" \
+  "${brew_dir}/cli.Brewfile" \
   "${brew_dir}/regular.Brewfile" \
-  "${brew_dir}/base.Brewfile"
+  "${brew_dir}/base.Brewfile" \
+  "${brew_dir}/Brewfile"
 do
   if [[ -f "${candidate}" ]]; then
     regular_brewfile="${candidate}"
@@ -51,9 +79,11 @@ done
 
 developer_brewfile=""
 for candidate in \
+  "${brew_dir}/ide.Brewfile" \
   "${brew_dir}/developer.Brewfile" \
   "${brew_dir}/Brewfile-developer" \
-  "${brew_dir}/dx.Brewfile"
+  "${brew_dir}/dx.Brewfile" \
+  "${brew_dir}/experimental-ide.Brewfile"
 do
   if [[ -f "${candidate}" ]]; then
     developer_brewfile="${candidate}"
@@ -69,12 +99,14 @@ if [[ -z "${developer_brewfile}" ]]; then
 fi
 
 if [[ -z "${regular_brewfile}" ]]; then
-  echo "Could not resolve Bluefin regular Brewfile from Bluefin main."
-  exit 1
+  echo "Could not resolve Bluefin regular Brewfile; skipping curated brew sync."
+  touch "${STATE_FILE}"
+  exit 0
 fi
 if [[ -z "${developer_brewfile}" ]]; then
-  echo "Could not resolve Bluefin developer Brewfile from Bluefin main."
-  exit 1
+  echo "Could not resolve Bluefin developer Brewfile; skipping curated brew sync."
+  touch "${STATE_FILE}"
+  exit 0
 fi
 
 brew_bin=""
@@ -90,8 +122,9 @@ do
 done
 
 if [[ -z "${brew_bin}" ]]; then
-  echo "Homebrew binary not found; ensure BlueBuild brew module is enabled."
-  exit 1
+  echo "Homebrew binary not found; skipping curated brew sync."
+  touch "${STATE_FILE}"
+  exit 0
 fi
 
 common_env=(
