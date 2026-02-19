@@ -8,6 +8,10 @@ on:
       - "README.md"
   workflow_dispatch:
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref || github.run_id }}
+  cancel-in-progress: true
+
 permissions:
   contents: read
   packages: write
@@ -51,3 +55,4 @@ jobs:
           recipe: recipe.yml
           cosign_private_key: ${{ secrets.SIGNING_SECRET }}
           registry_token: ${{ github.token }}
+          pr_event_number: ${{ github.event.number }}
