@@ -9,6 +9,9 @@ image-version: latest
 
 modules:
   - type: dnf
+    repos:
+      copr:
+        - ublue-os/packages
     group-install:
       with-optional: true
       packages:
@@ -19,6 +22,7 @@ modules:
         - lightdm-gtk
         - slick-greeter
         - distrobox
+        - uupd
 
   - type: files
     files:
@@ -57,5 +61,8 @@ modules:
       enabled:
         - lightdm.service
         - bluefin-brew-sync.service
+        - uupd.timer
+      disabled:
+        - rpm-ostreed-automatic.timer
 
   - type: signing
