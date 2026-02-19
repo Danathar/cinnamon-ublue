@@ -13,7 +13,6 @@ Fedora bootc/Universal Blue style image using Cinnamon, built with BlueBuild.
 - Homebrew via BlueBuild `brew` module
 - Flatpaks via BlueBuild `default-flatpaks` module (system scope, Flathub)
   - Bluefin-like curated subset, with Firefox excluded (RPM Firefox is included)
-- No one-shot Bluefin Homebrew sync is enabled; install or manage extra brew packages manually.
 - GitHub Actions build workflows in `.github/workflows/`
 
 ## Build Locally
