@@ -60,7 +60,6 @@ modules:
     system:
       enabled:
         - lightdm.service
-        - bluefin-brew-sync.service
         - uupd.timer
       disabled:
         - rpm-ostreed-automatic.timer
