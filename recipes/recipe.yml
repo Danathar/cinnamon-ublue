@@ -23,6 +23,12 @@ modules:
         - slick-greeter
         - distrobox
         - uupd
+    remove:
+      packages:
+        - gnome-calculator
+        - file-roller
+        - simple-scan
+        - thunderbird
 
   - type: files
     files:
