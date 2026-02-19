@@ -16,6 +16,11 @@ Fedora bootc/Universal Blue style image using Cinnamon, built with BlueBuild.
 - Automatic ongoing updates handled by `uupd.timer` (brew, flatpak, distrobox, and system)
 - GitHub Actions build workflows in `.github/workflows/`
 
+## First Boot Notes
+
+- On first boot, system Flatpaks are installed before LightDM starts.
+- In testing, Cinnamon may restart once on the very first login while initial desktop/session state settles. Subsequent logins are normal.
+
 ## Build Locally
 
 Requirements:
@@ -202,6 +207,9 @@ Root cause was stale tag usage (`localhost/cinnamon:latest` still pointing to an
 
 4. bootc-image-builder manifest error for `/boot`
 Required setting a supported root filesystem (`--rootfs ext4`) when generating qcow2.
+
+5. Flatpaks not immediately visible in Cinnamon app menu on first login
+Fixed by gating first graphical login on one-time `system-flatpak-setup.service` completion and marking setup done with `/var/lib/cinnamon-flatpak-setup/done`.
 
 ## GitHub Actions Notes
 
