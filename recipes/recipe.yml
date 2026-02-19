@@ -56,6 +56,5 @@ modules:
     system:
       enabled:
         - lightdm.service
-        - bluefin-brew-sync.service
 
   - type: signing
