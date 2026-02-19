@@ -19,3 +19,4 @@ jobs:
           recipe: recipe.yml
           push: false
           build_opts: --no-sign
+          registry_token: ${{ github.token }}
