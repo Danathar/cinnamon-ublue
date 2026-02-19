@@ -9,9 +9,6 @@ image-version: latest
 
 modules:
   - type: dnf
-    repos:
-      copr:
-        - ublue-os/packages
     group-install:
       with-optional: true
       packages:
@@ -22,7 +19,6 @@ modules:
         - lightdm-gtk
         - slick-greeter
         - distrobox
-        - uupd
 
   - type: files
     files:
@@ -50,24 +46,15 @@ modules:
           - io.gitlab.adhami3310.Impression
           - io.missioncenter.MissionCenter
           - it.mijorus.smile
-          - org.gnome.Calculator
           - org.gnome.Connections
           - org.gnome.DejaDup
-          - org.gnome.FileRoller
           - org.gnome.Firmware
           - org.gnome.Logs
-          - org.gnome.SimpleScan
-          - org.gnome.Weather
-          - org.gnome.baobab
-          - org.mozilla.Thunderbird
           - page.tesk.Refine
 
   - type: systemd
     system:
       enabled:
         - lightdm.service
-        - uupd.timer
-      disabled:
-        - rpm-ostreed-automatic.timer
 
   - type: signing
