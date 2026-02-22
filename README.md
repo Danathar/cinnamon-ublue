@@ -212,13 +212,16 @@ Required setting a supported root filesystem (`--rootfs ext4`) when generating q
 5. Flatpaks not immediately visible in Cinnamon app menu on first login
 Fixed by gating first graphical login on one-time `system-flatpak-setup.service` completion and marking setup done with `/var/lib/cinnamon-flatpak-setup/done`.
 
+6. Staged-update terminal notice did not behave like Aurora/Bluefin
+`starship` is not available as a normal DNF package in this build context, so the prompt notice failed when installed that way. We now install `starship` from the upstream release tarball at build time and use a Starship custom module to show `New deployment staged` when an update is pending.
+
 ## GitHub Actions Notes
 
 - `build.yml`: builds/pushes image on push/schedule/manual.
 - `build-pr.yml`: PR validation build.
 - Add secret `SIGNING_SECRET` with contents of `cosign.key`.
 - Add secret `COSIGN_PASSWORD` with the password used to generate `cosign.key` (use empty string only if your key was created with empty password).
-- `build.yml` ignores README-only pushes.
+- Build workflows ignore README-only pushes (`README.md` and `**/README.md`).
 
 ## Update Behavior
 
