@@ -36,6 +36,8 @@ bluebuild generate-iso \
   image ghcr.io/danathar/cinnamon:latest
 ```
 
+Note: BlueBuild's ISO generator currently uses the community utility [`JasonN3/build-container-installer`](https://github.com/JasonN3/build-container-installer), not Fedora's official `bootc-image-builder` path documented by Fedora/bootc: <https://osbuild.org/docs/bootc/>.
+
 3. Boot the ISO and install.
 
 Detailed instructions and caveats: [`docs/install-iso.md`](docs/install-iso.md).
