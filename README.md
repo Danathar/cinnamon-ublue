@@ -37,7 +37,7 @@ bluebuild generate-iso \
 
 3. Boot the ISO and install.
 
-Detailed instructions and caveats: `docs/install-iso.md`.
+Detailed instructions and caveats: [`docs/install-iso.md`](docs/install-iso.md).
 
 ## First Boot Summary
 
@@ -45,14 +45,13 @@ Detailed instructions and caveats: `docs/install-iso.md`.
 - If first boot had no network, that setup delay may occur on a later boot after network is configured (occasional).
 - For non-Anaconda install paths (raw/qcow2 disk image), time defaults to UTC; set timezone after first boot.
 
-More details and known quirks: `docs/troubleshooting.md`.
+More details and known quirks: [`docs/troubleshooting.md`](docs/troubleshooting.md).
 
 ## Documentation
 
-- Local builds: `docs/build-locally.md`
-- Installer ISO install: `docs/install-iso.md`
-- Disk image install (qcow2/raw): `docs/install-disk-image.md`
-- Troubleshooting and known behaviors: `docs/troubleshooting.md`
-- CI, signing, and update-path config: `docs/ci-and-signing.md`
-- Using this repo as template or fork: `docs/repo-template-or-fork.md`
-
+- Local builds: [`docs/build-locally.md`](docs/build-locally.md)
+- Installer ISO install: [`docs/install-iso.md`](docs/install-iso.md)
+- Disk image install (qcow2/raw): [`docs/install-disk-image.md`](docs/install-disk-image.md)
+- Troubleshooting and known behaviors: [`docs/troubleshooting.md`](docs/troubleshooting.md)
+- CI, signing, and update-path config: [`docs/ci-and-signing.md`](docs/ci-and-signing.md)
+- Using this repo as template or fork: [`docs/repo-template-or-fork.md`](docs/repo-template-or-fork.md)
