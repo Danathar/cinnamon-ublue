@@ -8,7 +8,7 @@ This is the recommended install path for most users.
 - `podman`
 - `bluebuild` CLI
 
-If `bluebuild` is not installed, install it with podman:
+If `bluebuild` is not installed, install it with podman. Install instructions: [blue-build/cli#installation](https://github.com/blue-build/cli#installation)
 
 ```bash
 podman run --pull always --rm ghcr.io/blue-build/cli:latest-installer | bash
@@ -58,4 +58,3 @@ Output ISO path:
 
 - If wired network is already connected during first boot, reaching LightDM can take longer while initial system Flatpak setup completes.
 - If no network is available on first boot and you connect Wi-Fi from the desktop later, you may see that Flatpak setup delay on second boot (occasional, not guaranteed).
-

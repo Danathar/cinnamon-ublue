@@ -18,7 +18,7 @@ Fedora bootc/Universal Blue style image using Cinnamon, built with BlueBuild.
 
 Use this path for most users.
 
-1. Install `bluebuild` CLI (if needed):
+1. Install `bluebuild` CLI (if needed). Install instructions: [blue-build/cli#installation](https://github.com/blue-build/cli#installation)
 
 ```bash
 podman run --pull always --rm ghcr.io/blue-build/cli:latest-installer | bash
