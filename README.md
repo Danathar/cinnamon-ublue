@@ -4,6 +4,7 @@ Fedora bootc/Universal Blue style image using Cinnamon, built with BlueBuild.
 
 > [!NOTE]
 > This is **not** an official Universal Blue image.  
+> It is built from official/trusted upstream sources and repos (Universal Blue base image, Fedora/RPM Fusion packages, Flathub, and Homebrew).
 > As of right now, this builds and runs, and you can use it. The installer is not as smooth or quick as I would like it to be (be patient if it seems like it's being slow... it's not), but that's an upstream Anaconda issue. Just be aware of the First Boot Summary issues and the part about delayed startup on first or second boot.
 
 ## What You Get
@@ -50,6 +51,14 @@ Detailed instructions and caveats: [`docs/install-iso.md`](docs/install-iso.md).
 - For non-Anaconda install paths (raw/qcow2 disk image), time defaults to UTC; set timezone after first boot.
 
 More details and known quirks: [`docs/troubleshooting.md`](docs/troubleshooting.md).
+
+## Automatic Updates
+
+- `Build and Push Image` (`.github/workflows/build.yml`): runs automatically on non-doc pushes to `main`, on a weekly schedule (`Sunday 05:30 UTC`), and can be run manually from the Actions tab.
+- `Build and Push Image` output: rebuilds/publishes signed `ghcr.io/danathar/cinnamon:latest` from current recipe sources.
+- `Dependabot` (`.github/dependabot.yml`): checks GitHub Actions dependencies daily and opens PRs for workflow/action version updates.
+- `Build PR Image` (`.github/workflows/build-pr.yml`): runs automatically on non-doc pull requests to validate buildability (no push/sign).
+- `Build and Push Beta Branch Image` (`.github/workflows/build-beta.yml`): runs automatically on non-doc pushes to non-`main` branches and publishes beta branch tags.
 
 ## Documentation
 
