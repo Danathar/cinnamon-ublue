@@ -1,5 +1,7 @@
 "$schema" = "https://starship.rs/config-schema.json"
 
+# Per-user Starship config template copied into new accounts from /etc/skel.
+# This ensures new users get a local config immediately at first login.
 add_newline = true
 
 [custom.update]

@@ -1,5 +1,7 @@
 "$schema" = "https://starship.rs/config-schema.json"
 
+# System-wide fallback Starship config.
+# Used only when a user does not already have ~/.config/starship.toml.
 add_newline = true
 
 [custom.update]
