@@ -3,7 +3,7 @@
 Fedora bootc/Universal Blue style image using Cinnamon, built with BlueBuild.
 
 > This is **not** an official Universal Blue image.  
-> It is a personal experimental project.
+> As of right now this builds and runs and you can use it. The installer is not as smooth or quick as I would like it (be patient if it seems like its being slow...its not), but thats an upstream anaconda issue. Just be aware of the first boot summary issues and the part about the delayed start up on first or second boot.
 
 ## What You Get
 
