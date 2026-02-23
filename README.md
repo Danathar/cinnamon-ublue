@@ -52,19 +52,12 @@ Detailed instructions and caveats: [`docs/install-iso.md`](docs/install-iso.md).
 
 More details and known quirks: [`docs/troubleshooting.md`](docs/troubleshooting.md).
 
-## Automatic Updates
-
-- `Build and Push Image` (`.github/workflows/build.yml`): runs automatically on non-doc pushes to `main`, on a weekly schedule (`Sunday 05:30 UTC`), and can be run manually from the Actions tab.
-- `Build and Push Image` output: rebuilds/publishes signed `ghcr.io/danathar/cinnamon:latest` from current recipe sources.
-- `Dependabot` (`.github/dependabot.yml`): checks GitHub Actions dependencies daily and opens PRs for workflow/action version updates.
-- `Build PR Image` (`.github/workflows/build-pr.yml`): runs automatically on non-doc pull requests to validate buildability (no push/sign).
-- `Build and Push Beta Branch Image` (`.github/workflows/build-beta.yml`): runs automatically on non-doc pushes to non-`main` branches and publishes beta branch tags.
-
 ## Documentation
 
 - Local builds: [`docs/build-locally.md`](docs/build-locally.md)
 - Installer ISO install: [`docs/install-iso.md`](docs/install-iso.md)
 - Disk image install (qcow2/raw): [`docs/install-disk-image.md`](docs/install-disk-image.md)
 - Troubleshooting and known behaviors: [`docs/troubleshooting.md`](docs/troubleshooting.md)
+- Automatic update/build cadence: [`docs/automatic-updates.md`](docs/automatic-updates.md)
 - CI, signing, and update-path config: [`docs/ci-and-signing.md`](docs/ci-and-signing.md)
 - Using this repo as template or fork: [`docs/repo-template-or-fork.md`](docs/repo-template-or-fork.md)

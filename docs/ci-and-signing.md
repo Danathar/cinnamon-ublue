@@ -6,7 +6,7 @@
 - `.github/workflows/build-beta.yml`: builds and pushes branch-tagged beta images for non-`main` branches.
 - `.github/workflows/build-pr.yml`: PR validation build (unsigned, non-push).
 
-README-only changes are ignored by workflows (`README.md` and `**/README.md`).
+Docs/markdown-only changes are ignored by image build workflows (`README.md`, `**/README.md`, `docs/**`, and `**/*.md`).
 
 ## Required GitHub Secrets
 
@@ -23,4 +23,3 @@ README-only changes are ignored by workflows (`README.md` and `**/README.md`).
 - `uupd.timer` is enabled for ongoing updates.
 - `rpm-ostreed-automatic.timer` is disabled to avoid duplicate auto-update paths.
 - `uupd` config file: `files/system/etc/uupd/config.json`.
-
