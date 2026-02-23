@@ -20,7 +20,7 @@ Fedora bootc/Universal Blue style image using Cinnamon, built with BlueBuild.
 
 - On first boot, system Flatpaks are installed before LightDM starts.
 - In testing, Cinnamon may restart once on the very first login while initial desktop/session state settles. Subsequent logins are normal.
-- Time is set to UTC by default. Set your timezone and geographic area after first boot (recommended: use the time/date app from the Cinnamon tray clock).
+- For non-Anaconda install paths (for example raw/qcow2 disk-image installs), time is set to UTC by default. Set your timezone and geographic area after first boot (recommended: use the time/date app from the Cinnamon tray clock).
 - Installer ISO caveats:
   - If a wired network is already connected during first boot, reaching LightDM can take longer while initial system Flatpak setup completes.
   - If no network is available on first boot and you connect Wi-Fi from the desktop later, you may see that Flatpak setup delay on second boot (this is occasional, not guaranteed).
