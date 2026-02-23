@@ -21,6 +21,9 @@ Fedora bootc/Universal Blue style image using Cinnamon, built with BlueBuild.
 - On first boot, system Flatpaks are installed before LightDM starts.
 - In testing, Cinnamon may restart once on the very first login while initial desktop/session state settles. Subsequent logins are normal.
 - Time is set to UTC by default. Set your timezone and geographic area after first boot (recommended: use the time/date app from the Cinnamon tray clock).
+- If a wired network is already connected during first boot, reaching LightDM can take longer while initial system Flatpak setup completes.
+- If no network is available on first boot and you connect Wi-Fi from the desktop later, that Flatpak setup delay usually shifts to the second boot (then later boots are normal).
+- Some systems may hit a known Anaconda installer UI issue where the Wi-Fi list is too long/cut off and selecting a network does not open the password dialog. If this occurs, continue install without network and configure Wi-Fi after first boot.
 
 ## Build Locally
 
@@ -42,6 +45,43 @@ sudo podman load -i oci/cinnamon.tar.gz
 sudo podman images
 sudo podman tag <NEW_IMAGE_ID> localhost/cinnamon:latest
 ```
+
+## Generate Installer ISO
+
+You can build an interactive installer ISO for your published image.
+
+Install `bluebuild` (if not already present) using podman:
+
+```bash
+podman run --pull always --rm ghcr.io/blue-build/cli:latest-installer | bash
+bluebuild --version
+```
+
+Build ISO from published image:
+
+```bash
+bluebuild generate-iso \
+  --variant kinoite \
+  --iso-name cinnamon-ublue.iso \
+  -o output \
+  image ghcr.io/danathar/cinnamon:latest
+```
+
+Or build ISO directly from local recipe:
+
+```bash
+bluebuild generate-iso \
+  --variant kinoite \
+  --iso-name cinnamon-ublue.iso \
+  -o output \
+  recipe recipes/recipe.yml
+```
+
+Notes:
+
+- `--variant` controls installer profile behavior, not your final image contents.
+- Common variants are `kinoite` (recommended), `server`, and `silverblue`.
+- Output ISO is written to `output/`.
 
 ## Generate Disk Image From GitHub-Built Image
 
