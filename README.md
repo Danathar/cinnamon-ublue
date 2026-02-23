@@ -5,61 +5,27 @@ Fedora bootc/Universal Blue style image using Cinnamon, built with BlueBuild.
 > This is **not** an official Universal Blue image.  
 > It is a personal experimental project.
 
-## Included
+## What You Get
 
 - Base image: `ghcr.io/ublue-os/base-main`
-- Desktop: `cinnamon-desktop` group + `lightdm` + `slick-greeter`
-- `distrobox`
+- Cinnamon desktop (`cinnamon-desktop` + `lightdm` + `slick-greeter`)
 - Homebrew via BlueBuild `brew` module
 - Flatpaks via BlueBuild `default-flatpaks` module (system scope, Flathub)
-  - Bluefin-like curated subset, with Firefox excluded (RPM Firefox is included)
-- Automatic ongoing updates handled by `uupd.timer` (brew, flatpak, distrobox, and system)
-- GitHub Actions build workflows in `.github/workflows/`
+- Automatic updates via `uupd.timer` (system, brew, flatpak, distrobox)
+- Signed image publishing workflows in `.github/workflows/`
 
-## First Boot Notes
+## Quick Start (Installer ISO)
 
-- On first boot, system Flatpaks are installed before LightDM starts.
-- In testing, Cinnamon may restart once on the very first login while initial desktop/session state settles. Subsequent logins are normal.
-- For non-Anaconda install paths (for example raw/qcow2 disk-image installs), time is set to UTC by default. Set your timezone and geographic area after first boot (recommended: use the time/date app from the Cinnamon tray clock).
-- Installer ISO caveats:
-  - If a wired network is already connected during first boot, reaching LightDM can take longer while initial system Flatpak setup completes.
-  - If no network is available on first boot and you connect Wi-Fi from the desktop later, you may see that Flatpak setup delay on second boot (this is occasional, not guaranteed).
-  - Some systems may hit a known Anaconda installer UI issue where the Wi-Fi list is too long/cut off and selecting a network does not open the password dialog. If this occurs, continue install without network and configure Wi-Fi after first boot.
-- Disk-image installs can show the same Flatpak setup timing behavior, but it is commonly noticed on second boot once network is available.
+Use this path for most users.
 
-## Build Locally
-
-Requirements:
-
-- `bluebuild`
-- `podman`
-
-Build OCI archive:
-
-```bash
-bluebuild --log-out .state/logs build --archive oci recipes/recipe.yml
-```
-
-Load and tag for local bootc-image-builder:
-
-```bash
-sudo podman load -i oci/cinnamon.tar.gz
-sudo podman images
-sudo podman tag <NEW_IMAGE_ID> localhost/cinnamon:latest
-```
-
-## Generate Installer ISO
-
-You can build an interactive installer ISO for your published image.
-
-Install `bluebuild` (if not already present) using podman:
+1. Install `bluebuild` CLI (if needed):
 
 ```bash
 podman run --pull always --rm ghcr.io/blue-build/cli:latest-installer | bash
 bluebuild --version
 ```
 
-Build ISO from published image:
+2. Build installer ISO from published image:
 
 ```bash
 bluebuild generate-iso \
@@ -69,253 +35,24 @@ bluebuild generate-iso \
   image ghcr.io/danathar/cinnamon:latest
 ```
 
-Or build ISO directly from local recipe:
+3. Boot the ISO and install.
 
-```bash
-bluebuild generate-iso \
-  --variant kinoite \
-  --iso-name cinnamon-ublue.iso \
-  -o output \
-  recipe recipes/recipe.yml
-```
+Detailed instructions and caveats: `docs/install-iso.md`.
 
-Notes:
+## First Boot Summary
 
-- `--variant` controls installer profile behavior, not your final image contents.
-- Common variants are `kinoite` (recommended), `server`, and `silverblue`.
-- Output ISO is written to `output/`.
+- First graphical login is gated on one-time system Flatpak setup, so reaching LightDM can take longer when network is available.
+- If first boot had no network, that setup delay may occur on a later boot after network is configured (occasional).
+- For non-Anaconda install paths (raw/qcow2 disk image), time defaults to UTC; set timezone after first boot.
 
-## Generate Disk Image From GitHub-Built Image
+More details and known quirks: `docs/troubleshooting.md`.
 
-After GitHub Actions publishes your image to GHCR, generate a disk image directly from it with `bootc-image-builder`.
+## Documentation
 
-1. Prepare directories:
+- Local builds: `docs/build-locally.md`
+- Installer ISO install: `docs/install-iso.md`
+- Disk image install (qcow2/raw): `docs/install-disk-image.md`
+- Troubleshooting and known behaviors: `docs/troubleshooting.md`
+- CI, signing, and update-path config: `docs/ci-and-signing.md`
+- Using this repo as template or fork: `docs/repo-template-or-fork.md`
 
-```bash
-mkdir -p output
-```
-
-2. Download `config.toml` from this repository:
-
-```bash
-curl -fsSLO https://raw.githubusercontent.com/Danathar/cinnamon-ublue/refs/heads/main/config.toml
-```
-
-3. Pull your published image:
-
-```bash
-sudo podman pull ghcr.io/danathar/cinnamon:latest
-```
-
-4. Build a `qcow2` image:
-
-`output/` must exist before this command (`mkdir -p output`).
-
-```bash
-sudo podman run --rm -it --privileged \
-  --security-opt label=type:unconfined_t \
-  -v "$(pwd)/config.toml:/config.toml:ro" \
-  -v "$(pwd)/output:/output" \
-  -v /var/lib/containers/storage:/var/lib/containers/storage \
-  quay.io/centos-bootc/bootc-image-builder:latest \
-  --type qcow2 \
-  --rootfs ext4 \
-  --config /config.toml \
-  ghcr.io/danathar/cinnamon:latest
-```
-
-Output is in `output/qcow2/disk.qcow2`.
-
-### Create a VM with `virt-install`
-
-After copying `disk.qcow2` to your host system:
-
-```bash
-virt-install \
-  --name cinnamon-ublue-test \
-  --memory 4096 \
-  --vcpus 4 \
-  --cpu host-passthrough \
-  --import \
-  --disk path=/var/home/$USER/disk.qcow2,format=qcow2,bus=virtio \
-  --os-variant fedora-unknown \
-  --network user,model=virtio \
-  --graphics spice \
-  --video virtio \
-  --channel spicevmc \
-  --boot uefi
-```
-
-If you use `qemu:///session`, `--network user,model=virtio` is the safe default.
-
-### Change Disk Type
-
-Change `--type`:
-
-- `--type qcow2` for KVM/libvirt/virt-manager
-- `--type raw` for raw disk image workflows
-- `--type ami` for AWS-style image outputs (when supported by your build setup)
-
-## Run on Bare Metal
-
-For physical hardware, generate a `raw` disk image and write it to the target disk.
-
-Status: this bare-metal flow has not been tested yet in this project.
-
-1. Prepare files:
-
-```bash
-mkdir -p output
-curl -fsSLO https://raw.githubusercontent.com/Danathar/cinnamon-ublue/main/config.toml
-sudo podman pull ghcr.io/danathar/cinnamon:latest
-```
-
-2. Build raw image:
-
-```bash
-sudo podman run --rm -it --privileged \
-  --security-opt label=type:unconfined_t \
-  -v "$(pwd)/config.toml:/config.toml:ro" \
-  -v "$(pwd)/output:/output" \
-  -v /var/lib/containers/storage:/var/lib/containers/storage \
-  quay.io/centos-bootc/bootc-image-builder:latest \
-  --type raw \
-  --rootfs ext4 \
-  --config /config.toml \
-  ghcr.io/danathar/cinnamon:latest
-```
-
-3. Write image to target disk (example: `/dev/nvme0n1`):
-
-```bash
-sudo lsblk
-sudo dd if=output/raw/disk.raw of=/dev/nvme0n1 bs=16M status=progress oflag=direct conv=fsync
-sync
-```
-
-4. Reboot into the installed disk.
-
-Notes:
-
-- `dd` will erase the target disk completely. Double-check device path with `lsblk`.
-- If your output filename differs, check `output/raw/` and adjust the `dd if=` path.
-- User setup comes from `config.toml` (currently user `cin` with password `changeme`).
-
-### Change Disk Size
-
-Set size in `config.toml`:
-
-```toml
-[customizations]
-disk = { minsize = "40 GiB" }
-```
-
-This repository defaults to `40 GiB` in `config.toml`.
-
-### Add or Change Users in `config.toml`
-
-Current user block:
-
-```toml
-[[customizations.user]]
-name = "cin"
-password = "changeme"
-groups = ["wheel"]
-```
-
-Add more users by adding additional `[[customizations.user]]` blocks:
-
-```toml
-[[customizations.user]]
-name = "alice"
-password = "changeme"
-groups = ["wheel"]
-
-[[customizations.user]]
-name = "bob"
-password = "changeme"
-groups = []
-```
-
-## Issues We Fixed
-
-1. Fedora release identity conflict
-Removed `fedora-release-cinnamon` and `fedora-release-identity-cinnamon` from recipe installs because they conflict with `fedora-release-identity-basic` in `base-main`.
-
-2. LightDM failed on boot (`/var/cache/lightdm` + `/var/lib/lightdm-data` errors)
-Added tmpfiles overlay at `files/system/usr/lib/tmpfiles.d/zz-lightdm-local.conf` to create required LightDM directories with correct ownership.
-
-3. New fixes not appearing in qcow2
-Root cause was stale tag usage (`localhost/cinnamon:latest` still pointing to an older image). The fix was to retag the newest loaded image ID before generating qcow2.
-
-4. bootc-image-builder manifest error for `/boot`
-Required setting a supported root filesystem (`--rootfs ext4`) when generating qcow2.
-
-5. Flatpaks not immediately visible in Cinnamon app menu on first login
-Fixed by gating first graphical login on one-time `system-flatpak-setup.service` completion and marking setup done with `/var/lib/cinnamon-flatpak-setup/done`.
-
-6. Staged-update terminal notice did not behave like Aurora/Bluefin
-`starship` is not available as a normal DNF package in this build context, so the prompt notice failed when installed that way. We now install `starship` from the upstream release tarball at build time and use a Starship custom module to show `New deployment staged` when an update is pending.
-
-## GitHub Actions Notes
-
-- `build.yml`: builds/pushes image on push/schedule/manual.
-- `build-pr.yml`: PR validation build.
-- Add secret `SIGNING_SECRET` with contents of `cosign.key`.
-- Add secret `COSIGN_PASSWORD` with the password used to generate `cosign.key` (use empty string only if your key was created with empty password).
-- Build workflows ignore README-only pushes (`README.md` and `**/README.md`).
-
-## Update Behavior
-
-- `uupd.timer` is enabled for automatic updates.
-- `rpm-ostreed-automatic.timer` is disabled to avoid duplicate system auto-update paths.
-- `uupd` configuration is managed at `files/system/etc/uupd/config.json`.
-
-## Use as Template or Fork
-
-If you want your own image in your own GitHub account, you have two options:
-
-- Use Template: best for starting fresh without upstream git history.
-- Fork: best if you want easy upstream syncing/cherry-picking from this repo later.
-
-### Option A: Use Template (recommended for most users)
-
-1. On GitHub, open this repository and click `Use this template`.
-2. Create a new repository under your account (for example `my-cinnamon-ublue`).
-3. Clone your new repository locally.
-4. Update image identity in `recipes/recipe.yml`:
-   - `name:` (image name)
-   - `base-image:` (leave as-is unless you intentionally change base)
-   - `image-version:` (keep `latest` for main)
-5. In GitHub repo settings, add Actions secrets:
-   - `SIGNING_SECRET`: full contents of your `cosign.key`
-   - `COSIGN_PASSWORD`: password used when that key was created
-6. Ensure `cosign.pub` is committed at repo root.
-7. Push to `main` and wait for `Build and Push Image` workflow to complete.
-8. Verify image exists in GHCR:
-   - `ghcr.io/<your-github-username>/<image-name>:latest`
-
-### Option B: Fork
-
-1. On GitHub, click `Fork`.
-2. In your fork settings, add the same secrets:
-   - `SIGNING_SECRET`
-   - `COSIGN_PASSWORD`
-3. Confirm `Actions` are enabled for the fork.
-4. Push a commit to your fork `main` and confirm build success.
-5. Your image is published under your account namespace in GHCR.
-
-### Template vs Fork Decision
-
-- Use Template when:
-  - You want a clean independent project.
-  - You do not want inherited commit history/noise.
-- Use Fork when:
-  - You plan to regularly pull updates from this repository.
-  - You want easy upstream diff visibility.
-
-### Branch Build Behavior
-
-- `main` pushes publish your stable image (`:latest`).
-- Non-`main` branch pushes publish beta branch images via `build-beta.yml`.
-- Dependabot branches are excluded from beta image publishing.
