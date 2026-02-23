@@ -1,4 +1,5 @@
 # yaml-language-server: $schema=https://schema.blue-build.org/recipe-v1.json
+# Final published image name: ghcr.io/<namespace>/cinnamon:<image-version>
 name: cinnamon
 
 description: >-
@@ -8,6 +9,7 @@ base-image: ghcr.io/ublue-os/base-main
 image-version: latest
 
 modules:
+  # Core OS package layering and removals.
   - type: dnf
     repos:
       copr:
@@ -18,32 +20,41 @@ modules:
         - cinnamon-desktop
     install:
       packages:
+        # RPM Fusion nonfree release for Broadcom firmware tooling.
         - https://mirrors.rpmfusion.org/nonfree/fedora/rpmfusion-nonfree-release-%OS_VERSION%.noarch.rpm
+        # Broadcom legacy Wi-Fi firmware extractor (D630/T420 era hardware path).
         - b43-fwcutter
+        # Cinnamon display manager and greeter stack.
         - lightdm
         - lightdm-gtk
         - slick-greeter
+        # Runtime tooling expected in this image profile.
         - distrobox
         - uupd
     remove:
       packages:
+        # Replaced by curated Flatpak defaults below.
         - gnome-calculator
         - file-roller
         - simple-scan
         - thunderbird
 
+  # Copy system configuration files from files/system into image root.
   - type: files
     files:
       - source: system
         destination: /
 
+  # Install Starship prompt binary used for staged-update notice in shells.
   - type: script
     scripts:
       - install-starship.sh
 
+  # Enable Homebrew support for CLI/package workflows.
   - type: brew
     brew-analytics: false
 
+  # Seed default system-wide Flatpaks from Flathub at first boot.
   - type: default-flatpaks
     configurations:
       - notify: false
@@ -74,12 +85,16 @@ modules:
           - org.mozilla.Thunderbird
           - page.tesk.Refine
 
+  # Enable/disable system services expected for this image.
   - type: systemd
     system:
       enabled:
         - lightdm.service
+        # uupd handles bootc, brew, flatpak, and distrobox updates.
         - uupd.timer
       disabled:
+        # Disable rpm-ostree auto path to avoid overlapping update mechanisms.
         - rpm-ostreed-automatic.timer
 
+  # Sign published OCI image using repo cosign configuration.
   - type: signing

@@ -1,7 +1,12 @@
 [customizations]
+# Minimum virtual disk size expected for generated disk images.
+# This applies to bootc-image-builder style image outputs (raw/qcow2).
 disk = { minsize = "40 GiB" }
 
 [[customizations.user]]
+  # Default local user for non-Anaconda image installs.
   name = "cin"
+  # Placeholder credential for first boot; users should change this immediately.
   password = "changeme"
+  # wheel grants sudo/admin access.
   groups = ["wheel"]

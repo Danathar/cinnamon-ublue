@@ -2,17 +2,23 @@
 
 set -euo pipefail
 
+# One-shot helper to install Bluefin's curated Homebrew bundles for the
+# primary desktop user. A state file prevents re-running after success.
 STATE_FILE="/var/lib/bluefin-brew-sync/done"
 WORK_DIR="/var/tmp/bluefin-brew-sync"
+# TARGET_USER can be UID or username; service defaults to UID 1000.
 TARGET_USER="${TARGET_USER:-1000}"
+# Fallback source image when local curated Brewfiles are not present.
 BLUEFIN_IMAGE="${BLUEFIN_IMAGE:-ghcr.io/ublue-os/bluefin:latest}"
 
+# Resolve user from numeric UID or pass through username as-is.
 if [[ "${TARGET_USER}" =~ ^[0-9]+$ ]]; then
   TARGET_NAME="$(getent passwd "${TARGET_USER}" | cut -d: -f1 || true)"
 else
   TARGET_NAME="${TARGET_USER}"
 fi
 
+# Exit cleanly if first-login user account/home is not ready yet.
 if [[ -z "${TARGET_NAME}" ]] || ! id "${TARGET_NAME}" >/dev/null 2>&1; then
   echo "Target user '${TARGET_USER}' does not exist yet; skipping for now."
   exit 0
@@ -50,6 +56,7 @@ if [[ -z "${brew_dir}" ]]; then
   fi
 
   container_id="$(podman create "${BLUEFIN_IMAGE}" true)"
+  # Ensure transient container is cleaned up even on early exit.
   cleanup() {
     podman rm -f "${container_id}" >/dev/null 2>&1 || true
   }
@@ -65,6 +72,7 @@ if [[ -z "${brew_dir}" ]]; then
 fi
 
 regular_brewfile=""
+# Prefer known file names before fuzzy matching.
 for candidate in \
   "${brew_dir}/cli.Brewfile" \
   "${brew_dir}/regular.Brewfile" \
@@ -78,6 +86,7 @@ do
 done
 
 developer_brewfile=""
+# Pick developer-oriented bundle separately so both profiles are applied.
 for candidate in \
   "${brew_dir}/ide.Brewfile" \
   "${brew_dir}/developer.Brewfile" \
@@ -91,6 +100,7 @@ do
   fi
 done
 
+# Fallback heuristics for renamed Brewfile layouts.
 if [[ -z "${regular_brewfile}" ]]; then
   regular_brewfile="$(find "${brew_dir}" -maxdepth 2 -type f -name '*Brewfile*' | grep -Ev '(dev|devel|developer|dx)' | head -n1 || true)"
 fi
@@ -110,6 +120,7 @@ if [[ -z "${developer_brewfile}" ]]; then
 fi
 
 brew_bin=""
+# Support common Homebrew paths across ublue/base variants.
 for candidate in \
   "/home/linuxbrew/.linuxbrew/bin/brew" \
   "/var/home/linuxbrew/.linuxbrew/bin/brew" \
@@ -128,6 +139,7 @@ if [[ -z "${brew_bin}" ]]; then
 fi
 
 common_env=(
+  # Run brew bundle as target user with explicit paths/home.
   "HOME=${TARGET_HOME}"
   "USER=${TARGET_NAME}"
   "LOGNAME=${TARGET_NAME}"
@@ -135,6 +147,7 @@ common_env=(
   "HOMEBREW_NO_ANALYTICS=1"
 )
 
+# Apply both curated bundles, then mark complete.
 runuser -u "${TARGET_NAME}" -- env "${common_env[@]}" "${brew_bin}" bundle --file "${regular_brewfile}"
 runuser -u "${TARGET_NAME}" -- env "${common_env[@]}" "${brew_bin}" bundle --file "${developer_brewfile}"
 

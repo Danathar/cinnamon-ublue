@@ -1,2 +1,3 @@
+# Legacy desktop/display manager hints consumed by some tools/scripts.
 DESKTOP="Cinnamon"
 DISPLAYMANAGER="LIGHTDM"

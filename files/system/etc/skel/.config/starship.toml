@@ -3,6 +3,8 @@
 add_newline = true
 
 [custom.update]
+# Show a prompt hint when a newer deployment is staged but not booted yet.
+# Kept in skel so new users get this behavior without manual setup.
 when = "/usr/bin/rpm-ostree status --json | /usr/bin/jq -e \".deployments[0].booted == false\" > /dev/null;"
 command = "echo \"New deployment staged\""
 symbol = "!"
