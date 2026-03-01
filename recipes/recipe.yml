@@ -28,6 +28,11 @@ modules:
         - lightdm
         - lightdm-gtk
         - slick-greeter
+        # Essential Mint themes and icons for a polished Cinnamon experience.
+        - mint-themes
+        - mint-y-icons
+        - mint-x-icons
+        - desktop-backgrounds-compat
         # Runtime tooling expected in this image profile.
         - distrobox
         - uupd

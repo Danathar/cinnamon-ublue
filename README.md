@@ -10,7 +10,7 @@ Fedora bootc/Universal Blue style image using Cinnamon, built with BlueBuild.
 ## What You Get
 
 - Base image: `ghcr.io/ublue-os/base-main`
-- Cinnamon desktop (`cinnamon-desktop` + `lightdm` + `slick-greeter`)
+- Cinnamon desktop (`cinnamon-desktop` + `lightdm` + `slick-greeter`, along with essential Mint themes and icons)
 - Homebrew via BlueBuild `brew` module
 - Flatpaks via BlueBuild `default-flatpaks` module (system scope, Flathub)
 - Automatic updates via `uupd.timer` (system, brew, flatpak, distrobox)
