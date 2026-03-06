@@ -1,4 +1,3 @@
-# Touching this file forces GitHub to re-check Dependabot updates.
 version: 2
 updates:
   - package-ecosystem: "github-actions"
