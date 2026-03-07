@@ -55,9 +55,10 @@ modules:
     scripts:
       - install-starship.sh
 
-  # Enable Homebrew support for CLI/package workflows.
-  - type: brew
-    brew-analytics: false
+  # Add this to pull the Brew OCI container
+  - type: containerfile
+    snippets:
+      - COPY --from=ghcr.io/ublue-os/brew:latest /system_files /
 
   # Seed default system-wide Flatpaks from Flathub at first boot.
   - type: default-flatpaks
